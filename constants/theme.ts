@@ -10,6 +10,16 @@ const tintColorDark = '#fff';
 
 export const Colors = {
   light: {
+    primary: "#404040",
+    success: "#55D98E",
+    info: "#36BFF5",
+    danger: "#F2522E",
+    warning: "#FFA91E",
+    white: '#FFFFFF',
+    light: '#656573',
+    lighter: '#F2F2F2',
+    card: "#FFFFFF",
+
     text: '#11181C',
     background: '#fff',
     tint: tintColorLight,
@@ -18,6 +28,16 @@ export const Colors = {
     tabIconSelected: tintColorLight,
   },
   dark: {
+    primary: "#252526",
+    success: "#55D98E",
+    info: "#36BFF5",
+    danger: "#F2522E",
+    warning: "#FFA91E",
+    white: '#FFFFFF',
+    light: '#656573',
+    lighter: '#2C2C2E',
+    card : '#2C2C2E',
+    
     text: '#ECEDEE',
     background: '#151718',
     tint: tintColorDark,
@@ -25,6 +45,22 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+  // light: {
+  //   text: '#11181C',
+  //   background: '#fff',
+  //   tint: tintColorLight,
+  //   icon: '#687076',
+  //   tabIconDefault: '#687076',
+  //   tabIconSelected: tintColorLight,
+  // },
+  // dark: {
+  //   text: '#ECEDEE',
+  //   background: '#151718',
+  //   tint: tintColorDark,
+  //   icon: '#9BA1A6',
+  //   tabIconDefault: '#9BA1A6',
+  //   tabIconSelected: tintColorDark,
+  // },
 };
 
 export const Fonts = Platform.select({

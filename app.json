@@ -1,36 +1,72 @@
 {
   "expo": {
     "name": "AlloMotors",
-    "slug": "AlloMotors",
-    "version": "1.0.0",
+    "slug": "AllMotor",
+    "version": "6.4.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/android_icon.png",
     "scheme": "allomotors",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.allmotorsi.app",
+      "buildNumber": "70",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Nous avons besoin d'accéder à votre photothèque pour vous permettre de téléverser une photo de profil, ajouter des images de véhicules lors de la création d'annonces, et partager ou consulter des médias (photos/vidéos) dans le chat.",
+        "NSCameraUsageDescription": "Nous utilisons votre caméra pour vous permettre de prendre des photos de véhicules lors de la création d'annonces ou de mettre à jour votre photo de profil directement depuis l'application.",
+        "NSMicrophoneUsageDescription": "Nous demandons l'accès au microphone pour vous permettre d’enregistrer du son ou des commentaires vocaux dans les vidéos de vos véhicules (optionnel).",
+        "NSLocationWhenInUseUsageDescription": "Nous utilisons votre position pour vous aider à découvrir des véhicules à vendre près de chez vous et à organiser des rendez-vous avec les vendeurs ou acheteurs.",
+        "NSUserNotificationUsageDescription": "Nous envoyons des notifications pour vous avertir des nouveaux messages, des réponses dans le chat ou des mises à jour concernant vos annonces de véhicules.",
+        "NSDocumentsFolderUsageDescription": "Nous avons besoin d'accéder à vos fichiers afin que vous puissiez importer des documents liés aux véhicules (ex : historique d’entretien) ou partager des médias (photos/vidéos/documents) via le chat.",
+        "CFBundleAllowMixedLocalizations": false,
+        "CFBundleDevelopmentRegion": "fr_FR",
+        "CFBundleLocalizations": [
+          "fr"
+        ],
+        "LSApplicationQueriesSchemes": [
+          "tel",
+          "telprompt"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/images/android_icon.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./google-services.json",
+      "package": "com.allmotorsi.app",
+      "versionCode": 93,
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "CALL_PHONE"
+      ]
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "config": {
+        "firebase": {
+          "measurementId": "G-BNLMF1WEFC"
+        }
+      }
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/android_icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -38,11 +74,88 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.allomotors.fr"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autorisez l'accès à votre bibliothèque photo pour téléverser une photo de profil, ajouter des images de véhicules dans les annonces, ou partager/consulter des médias dans le chat.",
+          "cameraPermission": "Autorisez l'utilisation de la caméra pour prendre des photos de véhicules lors de la création d'annonces ou pour mettre à jour votre photo de profil."
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production",
+          "devTeam": "C5T48LJBBR"
+        }
+      ],
+      [
+        "@react-native-firebase/app",
+        "@react-native-firebase/analytics"
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow AlloMotors to access your camera",
+          "microphonePermission": "Allow AlloMotors to access your microphone",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "oneSignalAppId": "c2913845-086d-4c4a-bbac-0b64c9f3b537",
+      "router": {
+        "origin": "https://allomotors.fr"
+      },
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.allmotorsi.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.allmotorsi.app.onesignal"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "f0100d03-8a6a-49d9-b43c-a32bcea1a6be"
+      }
     }
   }
 }

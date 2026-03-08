@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083026871981",
+    "project_id": "allomotors-14e75",
+    "storage_bucket": "allomotors-14e75.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083026871981:android:8f72bbdf82b90a71c41824",
+        "android_client_info": {
+          "package_name": "com.allmotorsi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZH1JXgq7OvBtW2y-ooaUHQeKfIhk-tlQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
