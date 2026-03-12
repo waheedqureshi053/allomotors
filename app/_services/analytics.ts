@@ -1,44 +1,57 @@
 
 
-import { getAnalytics, logEvent } from 'firebase/analytics';
-import { initializeApp } from 'firebase/app';
+import analytics from "@react-native-firebase/analytics";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDZH1JXgq7OvBtW2y-ooaUHQeKfIhk-tlQ",
-  authDomain: "allomotors-14e75.firebaseapp.com",
-  projectId: "allomotors-14e75",
-  storageBucket: "allomotors-14e75.firebasestorage.app",
-  messagingSenderId: "1083026871981",
-  appId: "1:1083026871981:android:8f72bbdf82b90a71c41824",
-  measurementId: "G-BNLMF1WEFC",
+export const trackEvent = async (
+  name: string,
+  params: Record<string, any> = {}
+) => {
+  try {
+    const eventName = name.toLowerCase().replace(/\s+/g, '_');
+
+    console.log('📊 Analytics Event:', eventName, params);
+
+    await analytics().logEvent(eventName, params);
+  } catch (error) {
+    console.log('Analytics Event Error:', error);
+  }
 };
 
-// initializeApp(firebaseConfig);
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+export const trackScreen = async (screenName: string) => {
+  try {
+    console.log('🚀 Screen View:', screenName);
 
-export const trackEvent = (name: string, params: Record<string, any> = {}) => {
-  logEvent(analytics, name, params);
+    await analytics().logScreenView({
+      screen_name: screenName,
+      screen_class: screenName,
+    });
+  } catch (error) {
+    console.log('Analytics Screen Error:', error);
+  }
 };
 
-export const trackScreen = (screen: string) => {
-  logEvent(analytics, "screen_view", {
-    firebase_screen: screen,
-    firebase_screen_class: screen,
-  });
+export const logEvent = async (
+  name: string,
+  params: Record<string, any> = {}
+) => {
+  try {
+    const eventName = name.toLowerCase().replace(/\s+/g, '_');
+
+    console.log('🚀 Analytics Event:', eventName, params);
+
+    await analytics().logEvent(eventName, params);
+  } catch (error) {
+    console.log('Analytics Event Error:', error);
+  }
 };
 
-
-
-// import analytics from '@react-native-firebase/analytics';
-
-// export async function logEvent(name: string, params?: any) {
-//   await analytics().logEvent(name, params);
-// }
-
-// export async function setAnalyticsUser(userId: string) {
-//   await analytics().setUserId(userId);
-// }
+export const setAnalyticsUser = async (userId: string) => {
+  try {
+    await analytics().setUserId(userId);
+  } catch (error) {
+    console.log('Analytics User Error:', error);
+  }
+};
 
 
 

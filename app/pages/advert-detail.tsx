@@ -118,7 +118,6 @@ export default function AdvertDetailScreen() {
 
             // Qureshi property check kr EnteredBy
             setparsedData(data);
-            //console.log("AdvertDetailScreen data:", data);
 
             trackEvent('advert_viewed', {
                 reference: data?.Reference,
@@ -235,7 +234,7 @@ export default function AdvertDetailScreen() {
                         Colors[colorScheme ?? 'light'].primary;
     };
     const pathname = usePathname();
-      
+
     if (loading) {
         return (
             <View style={[styles.background, styles.flexOne, styles.justifyCenter, styles.itemCenter]}>
@@ -507,7 +506,7 @@ export default function AdvertDetailScreen() {
                     </View>
                 )}
 
-                
+
 
                 {parsedData?.Description && parsedData.Description.length > 1 && (
                     <View style={[styles.card, { padding: 0 }]}>

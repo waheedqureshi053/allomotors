@@ -1,18 +1,16 @@
-import { Alert, Image,ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColorScheme } from 'react-native';
-import { useGlobalStyles } from '../_styles/globalStyle';
-import { useSession } from '../_services/ctx';
-import { FontAwesome, Ionicons } from '@expo/vector-icons'; 
-import { apiCall } from '../_services/api';
-import { router } from 'expo-router';
-import { useFocusEffect } from 'expo-router';
-import { ActivityIndicator } from 'react-native';
-import * as SignalR from '@microsoft/signalr';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import * as SignalR from '@microsoft/signalr';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { vmSearchObj } from '../_models/vmSearch';
+import { logEvent } from '../_services/analytics';
+import { apiCall } from '../_services/api';
+import { useSession } from '../_services/ctx';
+import { useGlobalStyles } from '../_styles/globalStyle';
 
 const setting = () => {
   const insets = useSafeAreaInsets();
@@ -33,7 +31,7 @@ const setting = () => {
   const [loading, setLoading] = useState(false);
   const [IsPaymentButtonVisible, setIsPaymentButtonVisible] = useState(false);
   // const [isUploadButton, setIsUploadButton] = useState(true)
-   const [PhotoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [PhotoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [attributes, setAttributes] = useState<any>('');
   const [SettingsOptions, setSettingsOptions] = useState<any>([]);
@@ -46,7 +44,7 @@ const setting = () => {
       setIsPaymentButtonVisible(true);
       return;
     };
-    await GetCompany(); 
+    await GetCompany();
     if (userRoles?.includes('DenyPayment') && !company?.Attributes?.DoPayment) {
       setIsPaymentButtonVisible(false);
     } else {
@@ -157,7 +155,7 @@ const setting = () => {
       { cancelable: true }
     );
   };
- const getSettingsOptions = () => {
+  const getSettingsOptions = () => {
     if (IsPaymentButtonVisible) {
       return [
         {
@@ -226,7 +224,12 @@ const setting = () => {
         {
           title: 'Profil',
           icon: 'person',
-          onPress: () => router.push('/pages/update-profile'),
+          onPress: async () => {
+            await logEvent('profile_tab_clicked', {
+              message: `Profile button clicked. OS : ${Platform.OS}`
+            });
+            router.push('/pages/update-profile')
+          },
         },
         {
           title: `Infos de l'application`,
@@ -347,7 +350,7 @@ const setting = () => {
           </View>
         </View>
         <View style={[{ backgroundColor: Colors[colorScheme ?? 'light'].primary, padding: 20, borderRadius: 10, marginBottom: 100 }]}>
-          {SettingsOptions.map((item : any, index : any) => (
+          {SettingsOptions.map((item: any, index: any) => (
             <TouchableOpacity
               key={index}
               style={[

@@ -1,20 +1,22 @@
+import analytics from '@react-native-firebase/analytics';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { router, Stack, usePathname, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import AppVersionCheck from '@/components/AppVersionCheck';
+import AutoScreenTracker from '@/components/AutoScreenTracker';
 import ExpoStripeProvider from '@/components/StripeProvider.web';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { LogBox, TouchableOpacity } from 'react-native';
+import { useEffect } from 'react';
+import { LogBox, Platform, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import SessionProvider from './_services/ctx';
 import { useGlobalStyles } from './_styles/globalStyle';
-import "./global.css";  
-import AutoScreenTracker from '@/components/AutoScreenTracker';
+import "./global.css";
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -140,6 +142,18 @@ function GlobalButton() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
+  useEffect(() => {
+    const initAnalytics = async () => {
+      await analytics().setAnalyticsCollectionEnabled(true);
+
+      await analytics().logEvent(`${Platform.OS}_initialise_event`, {
+        working: true
+      });
+    };
+
+    initAnalytics();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -191,7 +205,7 @@ export default function RootLayout() {
         </SessionProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
-    
+
     // <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
     //   <Stack>
     //     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
