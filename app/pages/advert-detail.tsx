@@ -12,7 +12,6 @@ import { usePathname, useSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { trackEvent } from "../_services/analytics";
 import { apiCall } from "../_services/api";
 import { getAuthToken } from "../_services/apiConfig";
 export default function AdvertDetailScreen() {
@@ -119,10 +118,10 @@ export default function AdvertDetailScreen() {
             // Qureshi property check kr EnteredBy
             setparsedData(data);
 
-            trackEvent('advert_viewed', {
-                reference: data?.Reference,
-                price: data?.Attributes?.SellingPrice,
-            });
+            // trackEvent('advert-detail-viewed', {
+            //     reference: data?.Reference,
+            //     price: data?.Attributes?.SellingPrice,
+            // });
 
             setSlides(slideImages);
         } catch (error) {
@@ -141,7 +140,6 @@ export default function AdvertDetailScreen() {
         setAllAds(data.obj);
         console.log("✅ allAds", data);
     };
-
     const handleStatusUpdate = async (newStatus: string) => {
         if (!parsedData?.ID) return;
         console.log("UpdateAdvertStatusSoft status:", newStatus);
@@ -207,7 +205,6 @@ export default function AdvertDetailScreen() {
 
         await Linking.openURL(formattedNumber);
     };
-
     const handleCall = (phoneNumber: string) => {
         if (!phoneNumber) {
             Alert.alert('Info', 'Aucun numéro de téléphone disponible');
@@ -224,8 +221,6 @@ export default function AdvertDetailScreen() {
             { cancelable: true }
         );
     };
-
-
     const getStatusColor = () => {
         return parsedData?.Status == 'Pending' ? Colors[colorScheme ?? 'light'].warning :
             parsedData?.Status == 'InActive' ? Colors[colorScheme ?? 'light'].warning :

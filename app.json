@@ -2,7 +2,7 @@
   "expo": {
     "name": "AlloMotors",
     "slug": "AllMotor",
-    "version": "6.4.0",
+    "version": "6.6.0",
     "orientation": "portrait",
     "icon": "./assets/images/android_icon.png",
     "scheme": "allomotors",
@@ -11,7 +11,7 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.allmotorsi.app",
-      "buildNumber": "70",
+      "buildNumber": "71",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -43,7 +43,7 @@
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
       "package": "com.allmotorsi.app",
-      "versionCode": 93,
+      "versionCode": 94,
       "permissions": [
         "com.google.android.gms.permission.AD_ID",
         "android.permission.READ_EXTERNAL_STORAGE",

@@ -5,17 +5,17 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { vmSearchObj } from "@/app/_models/vmSearch";
-import { apiCall } from "@/app/_services/api"; 
+import { apiCall } from "@/app/_services/api";
 import CarCardComponent from "@/components/CarCard";
 import { TextInput } from "react-native";
 import { useSession } from "@/app/_services/ctx";
 import { expo } from '../../../app.json'
-import { OneSignal } from "react-native-onesignal"; 
 import { AdCardComponent } from "@/components/AdCardComponent";
 import { ThemedText } from "@/components/themed-text";
 import { Colors } from "@/constants/theme";
-
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+import * as Notifications from "expo-notifications";
 
 
 
@@ -23,9 +23,9 @@ export default function CatelogsScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const { styles, FONT_SIZES } = useGlobalStyles();
-  const { session, user, GetCompany, company } = useSession();
+  const { user, GetCompany, company, logout } = useSession();
   const router = useRouter();
-  const [isPressed, setPressed] = useState(false);
+  //const [isPressed, setPressed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [Catalogs, setCatalogs] = useState<any[]>([]);
   const [searchText, setSearchText] = useState<string | null>(null);
@@ -35,9 +35,9 @@ export default function CatelogsScreen() {
   const listRef = useRef<FlatList<any>>(null);
   const onEndReachedCalledRef = useRef(false);
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
-
   const [allAds, setAllAds] = useState<any>([]);
   const [adsLoaded, setAdsLoaded] = useState(false);
+  const [isNotificationGrant, setNotificationGrant] = useState<string | null>(null);
 
   const fetchAds = async () => {
     const response = await apiCall('POST', '/Account/LoadPublicAds', {
@@ -50,9 +50,11 @@ export default function CatelogsScreen() {
   };
 
   useEffect(() => {
+    initializeNotifications();
     const fetchCompany = async () => {
       await GetCompany();
     }
+    
     fetchCompany();
     fetchAds();
   }, []);
@@ -135,88 +137,183 @@ export default function CatelogsScreen() {
     }
   };
 
-  useEffect(() => {
-    if (user?.UserId) {
-      //console.log("✅ User roles: ", user?.Roles);
-      storeOneSignal();
+useEffect(() => {
+  if (user?.UserId) {
+    syncOneSignalUser();
+    checkNotificationPermission();
+  }
+}, [user?.UserId]);
+
+/* ------------------ INITIALIZE ------------------ */
+
+const initializeNotifications = () => {
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+  OneSignal.initialize("c2913845-086d-4c4a-bbac-0b64c9f3b537");
+
+  OneSignal.Notifications.addEventListener('click', handleNotificationClick);
+};
+
+/* ------------------ CLICK HANDLER ------------------ */
+
+const handleNotificationClick = async (event: any) => {
+  try {
+
+    console.log("Notification clicked:", event);
+
+    const page = event?.notification?.additionalData?.page;
+    const userId = event?.notification?.additionalData?.UserId;
+    const ObjId = event?.notification?.additionalData?.ObjId;
+    const dbObj = event?.notification?.additionalData?.dbObj;
+
+    if (page === "AdvertDetails") {
+
+      setTimeout(() => {
+        router.push(`/catalogs/${ObjId}`);
+      }, 800);
+
+    } else if (page === "Requests") {
+
+      setTimeout(() => {
+        router.push({
+          pathname: "/pages/buyer-request-detail",
+          params: { id: ObjId, item: dbObj }
+        });
+      }, 800);
+
+    } else if (userId) {
+
+      setTimeout(() => {
+        router.push(`/chats/${userId}`);
+      }, 800);
+
+    }
+
+  } catch (error) {
+    console.log("Notification handling error:", error);
+  }
+};
+
+
+/* ------------------ SYNC USER ------------------ */
+
+const syncOneSignalUser = async () => {
+
+  try {
+
+    const id = user?.UserId?.replace(/"/g, "");
+
+    const response = await fetch(
+      "https://api.onesignal.com/apps/c2913845-086d-4c4a-bbac-0b64c9f3b537/users",
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          identity: {
+            external_id: id
+          }
+        })
+      }
+    );
+
+    const json = await response.json();
+
+    console.log("OneSignal Subscribe:", json);
+
+    if (!json?.errors) {
+      OneSignal.login(id);
+    }
+
+  } catch (error) {
+    console.log("OneSignal sync error:", error);
+  }
+
+};
+
+
+/* ------------------ SAVE USER PREFERENCE ------------------ */
+
+const SaveOSignalAcception = async (granted: boolean) => {
+
+  if (!user?.UserId) return;
+
+  try {
+
+    const data = {
+      SendOSignalNotification: granted,
+      OSignalID: granted ? user.UserId : ""
+    };
+
+    const response = await apiCall(
+      "post",
+      "/Account/SaveOSignalAcception",
+      new vmSearchObj(),
+      data
+    );
+
+    if ([200, 204].includes(response.status)) {
+      console.log("OSignal preference saved");
+    }
+
+  } catch (error) {
+    console.log("SaveOSignalAcception error:", error);
+  }
+
+};
+
+
+/* ------------------ PERMISSION ------------------ */
+
+const checkNotificationPermission = async () => {
+
+  try {
+
+    const stored = await AsyncStorage.getItem("isNotificationGrant");
+
+    if (stored !== null) {
+      setNotificationGrant(stored);
+      return;
+    }
+
+    const currentStatus = await OneSignal.Notifications.getPermissionAsync();
+
+    if (currentStatus) {
+
+      await AsyncStorage.setItem("isNotificationGrant", "true");
+      setNotificationGrant("true");
       SaveOSignalAcception(true);
-    }
-  }, [user?.UserId]);
+      return;
 
-  const storeOneSignal = async () => {
-    let id = user?.UserId.replace(/"/g, "");
-    ////console.log("USER ID ", id);
-    const url = 'https://api.onesignal.com/apps/c2913845-086d-4c4a-bbac-0b64c9f3b537/users';
-    const options = {
-      method: 'POST',
-      headers: { accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({
-        identity: {
-          external_id: id,
-        }
-      })
-    };
-
-    await fetch(url, options)
-      .then(res => res.json())
-      .then(json => {
-        ////console.log('ONE SIGNAL SUBSCRIBE JSON ', json);
-
-        if (json.errors) {
-          ////console.log("OneSignal error:", json.errors);
-        } else {
-          OneSignal.login(json.identity.external_id)
-        }
-      })
-      .catch(err => {
-        //console.log(err)  
-      }
-      );
-  };
-
-  const SaveOSignalAcception = async (granted: boolean = true) => {
-    let loginTimeout: NodeJS.Timeout | null = null;
-
-    try {
-      if (!user?.UserId) {
-        console.warn('User not available - skipping OneSignal operations');
-        return;
-      }
-
-      const data = {
-        SendOSignalNotification: granted,
-        OSignalID: granted ? user.UserId : ""
-      };
-
-      try {
-        const response = await apiCall(
-          'post',
-          `/Account/SaveOSignalAcception`,
-          new vmSearchObj(),
-          data
-        );
-
-        if ([200, 204]?.includes(response.status) || response.statusText === 'OK') {
-          //console.log("OSignal preferences saved successfully");
-          return;
-        }
-
-        throw new Error(`Unexpected status: ${response.status}`);
-      } catch (apiError) {
-        console.error('Unexpected error in SaveOSignalAcception API ERROR:', apiError);
-      }
-    } catch (error) {
-      console.error('Unexpected error in SaveOSignalAcception:', error);
     }
 
-    // Return cleanup function
-    return () => {
-      if (loginTimeout) {
-        clearTimeout(loginTimeout);
-        ////console.log('Cleared pending OneSignal login timeout');
-      }
-    };
-  };
+    const permission = await OneSignal.Notifications.requestPermission(true);
+
+    const granted = permission ? "true" : "false";
+
+    await AsyncStorage.setItem("isNotificationGrant", granted);
+    setNotificationGrant(granted);
+
+    SaveOSignalAcception(permission);
+
+  } catch (error) {
+    console.log("Notification permission error:", error);
+  }
+
+};
 
   const Customstyles = StyleSheet.create({
     // ... your existing styles

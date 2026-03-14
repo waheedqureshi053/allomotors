@@ -11,6 +11,7 @@ import * as SignalR from '@microsoft/signalr';
 import { apiCall } from "../_services/api";
 import { Colors } from "@/constants/theme";
 import { ThemedText } from "@/components/themed-text";
+import analytics from "@react-native-firebase/analytics";
 
 type SelectedObjectType = {
   [key: string]: any;
@@ -365,6 +366,24 @@ export default function BuyerRequestScreen() {
         null,
         data
       );
+      
+if(data?.Status == 'Accepted' || data?.Status == 'Sold'){
+  await analytics().logEvent('purchase', {
+  transaction_id: data?.ID,
+  value: data?.BuyersCommission,
+  currency: 'EUR',
+  items: [
+    {
+      item_name: parsedData?.AdvertTitle ? parsedData?.AdvertTitle : data?.RequestType,
+      item_id: data?.AdvertID,
+      price: data?.SellingPriceFinal,
+      quantity: 1
+    }
+  ]
+});
+}
+
+
       goBack();
       //console.log('Response:', response?.data);
       // const parsedData = {
@@ -429,29 +448,7 @@ export default function BuyerRequestScreen() {
               </Text>
             </View>
           </View>
-          {/* <View style={Customstyles.card}>
-            <Text style={Customstyles.sectionTitle}>Parties impliquées</Text>
-            <View style={Customstyles.partyContainer}>
-              <View style={Customstyles.partyCard}>
-                <Ionicons name="person-circle" size={24} color={Colors[colorScheme ?? 'light'].success} />
-                <Text style={Customstyles.partyTitle}>Acheteur</Text>
-                <Text style={Customstyles.partyName}>{parsedData?.RequesterName}</Text>
-                <Text style={Customstyles.partyDetail}>
-                  Commission: €{parsedData?.Attributes?.BuyersCommission ?? 0}
-                </Text>
-              </View>
-
-              <View style={Customstyles.partyCard}>
-                <Ionicons name="business" size={24} color={Colors[colorScheme ?? 'light'].warning} />
-                <Text style={Customstyles.partyTitle}>Vendeur</Text>
-                <Text style={Customstyles.partyName}>{parsedData?.AdvertOwnerName}</Text>
-                <Text style={Customstyles.partyDetail}>
-                  Commission: €{parsedData?.Attributes?.SellersCommission ?? 0}
-                </Text>
-              </View>
-            </View>
-          </View> */}
-
+          
           <Text style={Customstyles.sectionTitle}>Détails de l'offre</Text>
 
           <View className="mb-4" style={styles.card}>

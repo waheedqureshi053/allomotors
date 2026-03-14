@@ -1,68 +1,15 @@
-import { Redirect, router, Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSession } from '../_services/ctx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LogLevel, OneSignal } from 'react-native-onesignal';
-import * as Notifications from "expo-notifications";
 import TabBar from '@/components/TabBar';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [IsPaymentButtonVisible, setIsPaymentButtonVisible] = useState(false);
   const { IsReady, session, setSession, user, setUser, company, GetCompany } = useSession();
   const [isCatalog, setIsCatalog] = useState(false);
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true, // ✅ required
-      shouldShowList: true,   // ✅ required
-    }),
-  });
-
-  OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-
-  OneSignal.initialize("c2913845-086d-4c4a-bbac-0b64c9f3b537");
-
-  OneSignal.Notifications.requestPermission(true);
-
-  OneSignal.Notifications.addEventListener('click', async (event: any) => {
-    try {
-      console.log("OneSignal: notification clicked:", event);
-      let page = event?.notification?.additionalData?.page
-      let userId = event?.notification?.additionalData?.UserId;
-      let ObjId = event?.notification?.additionalData?.ObjId;
-      let dbObj = event?.notification?.additionalData?.dbObj;
-
-      console.log("Notification UserId", userId);
-      console.log("Notification ObjId", ObjId);
-
-      if (page == 'AdvertDetails') {
-        setTimeout(() => {
-          router.push(`/catalogs/${ObjId}`)
-        }, 1000);
-      } else if (page == 'Requests') {
-        setTimeout(() => {
-          router.push({
-            pathname: "/pages/buyer-request-detail",
-            params: { id: ObjId, item: dbObj }
-          });
-        }, 1000);
-      }
-      else {
-        if (userId) {
-          setTimeout(() => {
-            router.push(`/chats/${userId}`)
-          }, 1000);
-        }
-      }
-    } catch (err) {
-      console.log("Notification handling error:", err);
-    }
-  })
-
-
+  
 
   const GetCompanyInfo = async () => {
     const userRoles = user?.Roles || [];

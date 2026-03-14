@@ -4,15 +4,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'react-native';
 import { useGlobalStyles } from '../_styles/globalStyle';
 import { useSession } from '../_services/ctx';
-import { Feather, Ionicons } from '@expo/vector-icons'; 
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { apiCall } from '../_services/api';
 import { vmSearchObj } from '../_models/vmSearch';
 import * as ImagePicker from 'expo-image-picker';
-import { uploadFile } from '../_services/uploadService'; 
+import { uploadFile } from '../_services/uploadService';
 import { router } from 'expo-router';
 import { Switch } from "react-native-switch";
 import { ThemedText } from "@/components/themed-text";
 import { Colors } from "@/constants/theme";
+import NotificationPermissionCard from '@/components/NotificationPermissionCard';
 
 const UpdateProfileScreen = () => {
     const insets = useSafeAreaInsets();
@@ -250,6 +251,39 @@ const UpdateProfileScreen = () => {
     const goBack = () => {
         router.back();
     }
+
+
+    const SaveOSignalAcception = async (granted: boolean) => {
+        try {
+
+            if (!user?.UserId) {
+                console.warn("User not available - skipping OneSignal preference save");
+                return;
+            }
+
+            const data = {
+                SendOSignalNotification: granted,
+                OSignalID: granted ? user.UserId : ""
+            };
+
+            const response = await apiCall(
+                "post",
+                "/Account/SaveOSignalAcception",
+                new vmSearchObj(),
+                data
+            );
+
+            if ([200, 204].includes(response.status)) {
+                console.log("✅ Notification preference saved");
+            } else {
+                console.warn("Unexpected response:", response.status);
+            }
+
+        } catch (error) {
+            console.error("❌ SaveOSignalAcception error:", error);
+        }
+    };
+
     return (
         // <KeyboardAvoidingView style={[styles.flexOne]} keyboardVerticalOffset={100}
         //     behavior={Platform.OS === 'ios' ? 'padding' : 'height'} contentContainerStyle={[styles.background, { marginTop: insets.top }]}>
@@ -268,7 +302,7 @@ const UpdateProfileScreen = () => {
 
                 <View style={[styles.flexOne]}>
                     <View style={[styles.primary, styles.itemCenter, styles.justifyCenter, styles.relativePosition, { padding: 20, borderRadius: 10, marginTop: 20 }]}>
-                        <TouchableOpacity style={[styles.flexRow, styles.itemCenter, styles.justifyCenter, styles.roundedCircle, styles.absolutePosition, 
+                        <TouchableOpacity style={[styles.flexRow, styles.itemCenter, styles.justifyCenter, styles.roundedCircle, styles.absolutePosition,
                         { top: 10, left: 10, paddingHorizontal: 10, paddingVertical: 10, backgroundColor: Colors[colorScheme ?? 'light'].white }]}
                             onPress={() => { goBack() }}>
                             <Ionicons name="chevron-back" size={18} color="black" />
@@ -344,7 +378,10 @@ const UpdateProfileScreen = () => {
                             />
                             {errors.address && <Text style={[styles.colorDanger, { marginLeft: 15 }]}>{errors.address}</Text>}
                         </View>
-                        <View className="flex flex-row items-center gap-2 mb-5">
+
+
+
+                        <View className="flex flex-row items-center gap-2 mb-3">
                             <View className="flex-1">
                                 <ThemedText type="defaultSemiBold" style={[styles.fontBold, { fontSize: FONT_SIZES.sm, lineHeight: 22 }]}>Notifications par e-mail </ThemedText>
                                 <ThemedText type="default" style={[{ fontSize: FONT_SIZES.xs, lineHeight: 15 }]}>Nous vous enverrons une notification par email concernant les mises à jour de vos annonces à différentes étapes </ThemedText>
@@ -378,21 +415,17 @@ const UpdateProfileScreen = () => {
                             </View>
                         </View>
 
+                        <NotificationPermissionCard
+                            SaveOSignalAcception={SaveOSignalAcception}
+                            colorScheme={colorScheme}
+                        />
+
                     </View>
-                    <View>
+                    <View className='mb-10'>
                         <TouchableOpacity style={[styles.button, { paddingHorizontal: 15, paddingVertical: 15, backgroundColor: Colors[colorScheme ?? 'light'].primary, marginBottom: 15 }]}
                             onPress={UpdateProfile}>
                             <ThemedText type='default' lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.textCenter, styles.fontBold]}>Mettre à jour</ThemedText>
                         </TouchableOpacity>
-                        {/* <View className='flex flex-row items-center mb-4'>
-                            <View className='h-0.5 flex-1' style={{ backgroundColor: Colors[colorScheme ?? 'light'].lighter }}></View>
-                            <ThemedText className='mx-2'>Ou</ThemedText>
-                            <View className='h-0.5 flex-1' style={{ backgroundColor: Colors[colorScheme ?? 'light'].lighter }}></View>
-                        </View>
-                        <TouchableOpacity style={[styles.button, { paddingHorizontal: 15, paddingVertical: 15, backgroundColor: Colors[colorScheme ?? 'light'].danger, marginBottom: 20 }]}
-                            onPress={confirmDeleteAccount}>
-                            <ThemedText type='default' lightColor={Colors[colorScheme ?? 'light'].white} darkColor={Colors[colorScheme ?? 'light'].white} style={[styles.textCenter, styles.fontBold]}>Compte supprimé</ThemedText>
-                        </TouchableOpacity> */}
                     </View>
                 </View>
             </ScrollView>

@@ -1,9 +1,3 @@
-import analytics from '@react-native-firebase/analytics';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { router, Stack, usePathname, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
 import AppVersionCheck from '@/components/AppVersionCheck';
 import AutoScreenTracker from '@/components/AutoScreenTracker';
 import ExpoStripeProvider from '@/components/StripeProvider.web';
@@ -11,11 +5,16 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { router, Stack, usePathname, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { LogBox, Platform, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import SessionProvider from './_services/ctx';
 import { useGlobalStyles } from './_styles/globalStyle';
+import { useEffect } from 'react';
+import analytics from "@react-native-firebase/analytics";
 import "./global.css";
 
 export const unstable_settings = {
@@ -32,15 +31,15 @@ LogBox.ignoreLogs([
   '[Error: Uncaught (in promise, id: 13) Error: OneSignal native module not loaded]',
 
 ]); // Ignore log notification by message
-LogBox.ignoreAllLogs();
-
-
 
 // Ignore specific warnings/errors
 LogBox.ignoreLogs([
   "Could not load RNOneSignal native module",
-  "NOBRIDGE" // optional, hides all NOBRIDGE errors
+  "NOBRIDGE", // optional, hides all NOBRIDGE errors,
+  "ERROR  Could not load RNOneSignal native module. Make sure native dependencies are properly linked."
+
 ]);
+LogBox.ignoreAllLogs();
 
 // function GlobalButton() {
 //   const colorScheme = useColorScheme();
@@ -145,12 +144,10 @@ export default function RootLayout() {
   useEffect(() => {
     const initAnalytics = async () => {
       await analytics().setAnalyticsCollectionEnabled(true);
-
       await analytics().logEvent(`${Platform.OS}_initialise_event`, {
         working: true
       });
     };
-
     initAnalytics();
   }, []);
 
