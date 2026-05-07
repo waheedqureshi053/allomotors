@@ -26,6 +26,7 @@ export default function VehicleRequestScreen() {
     const params = useSearchParams();
     const id = params.get("id");
     const item = params.get("item");
+    const RequestType = params.get("RequestType");
     const parsedData = useMemo(() => {
         return typeof item === 'string' ? JSON.parse(item) : null;
     }, [item]);
@@ -116,9 +117,10 @@ export default function VehicleRequestScreen() {
 
     useEffect(() => {
         formData.SellingPrice = parsedData?.SellingPrice || 0;
+        formData.RequestType = RequestType || "Request";
         ChangeDurationOption(formData.Duration);
         //console.log("parsedData?.Attributes?.SellingPrice:", parsedData?.SellingPrice || 0);
-    }, [company, parsedData]);
+    }, [company, parsedData, RequestType]);
 
     useEffect(() => {
         if (session?.token) {

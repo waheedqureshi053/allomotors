@@ -165,8 +165,6 @@ export default function AdvertDetailScreen() {
     const initializeChat = async (id: any) => {
         try {
             const response = await apiCall("POST", `/Account/InitAdvertChat/${id}`, null, null);
-            // console.log("Advert Owner_OwnerID:", parsedData?.Owner_OwnerID);
-            // console.log("Advert Owner Type:", parsedData?.OwnerUserType);
             console.log("Advert Owner@OwnerID", parsedData?.Owner_OwnerID);
             console.log("Advert Owner@Type", parsedData?.OwnerType);
             console.log("@EnteredBy", parsedData?.EnteredBy);
@@ -477,28 +475,65 @@ export default function AdvertDetailScreen() {
                 </View>
 
                 {page == 'catelogs' && (
-                    <View className="flex flex-row items-center justify-between gap-3 mb-5">
-                        {parsedData?.EnteredBy !== user?.UserId && parsedData?.EnteredBy !== user?.OwnerID && (
-                            <>
+
+                    <>
+                        <View className="flex flex-row items-center justify-between gap-3 mb-5">
+                            {parsedData?.EnteredBy !== user?.UserId && parsedData?.EnteredBy !== user?.OwnerID && (
+                                <>
+                                    <View className="flex-1">
+                                        <TouchableOpacity onPress={() => initializeChat(parsedData?.ID)}
+                                            className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.primary, styles.btnShadow]}>
+                                            <Ionicons name="chatbubble-ellipses" size={24} color={Colors[colorScheme ?? 'light'].white} />
+                                            <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>Discussion</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            )}
+                            {parsedData?.EnteredBy && user?.UserId !== parsedData?.EnteredBy && (
                                 <View className="flex-1">
-                                    <TouchableOpacity onPress={() => initializeChat(parsedData?.ID)}
-                                        className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.primary, styles.btnShadow]}>
-                                        <Ionicons name="chatbubble-ellipses" size={24} color={Colors[colorScheme ?? 'light'].white} />
-                                        <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>Discussion</ThemedText>
+                                    <TouchableOpacity onPress={() => { router.push({ pathname: "/pages/request-form", params: { id: parsedData.ID, item: JSON.stringify(parsedData), RequestType: "Request" } }) }}
+                                        className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.danger, styles.btnShadow]}>
+                                        <Ionicons name="checkmark-circle" size={24} color={Colors[colorScheme ?? 'light'].white} />
+                                        <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>Acheter</ThemedText>
                                     </TouchableOpacity>
                                 </View>
+                            )}
+                        </View>
+
+                        <View className="flex flex-row items-center justify-between gap-3 mb-5">
+                            <>
+
+                                {parsedData?.EnteredBy && user?.UserId !== parsedData?.EnteredBy && (
+                                    <> 
+                                        <View className="flex-1">
+                                            <TouchableOpacity onPress={() => { router.push({ pathname: "/pages/request-form", params: { id: parsedData.ID, item: JSON.stringify(parsedData), RequestType: "Proposal" } }) }}
+                                                className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.outlineBorders]}>
+                                                <Ionicons name="diamond" size={24} color={Colors[colorScheme ?? 'light'].light} />
+                                                <ThemedText lightColor={Colors[colorScheme ?? 'light'].light} style={[styles.fontBold]}>Proposition</ThemedText>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
+                                )}
+
+                                {parsedData?.SaleAssistance && parsedData?.ReportStatus == 'Inspection Completed' && (
+
+                                    <View className="flex-1">
+                                        <TouchableOpacity onPress={() => {
+                                            router.push({
+                                                pathname: "/pages/technical-report", params: {
+                                                    id: parsedData?.ItemGuid, item: JSON.stringify(parsedData), page
+                                                }
+                                            })
+                                        }}
+                                            className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.success, styles.btnShadow]}>
+                                            <Ionicons name="cog" size={24} color={Colors[colorScheme ?? 'light'].white} />
+                                            <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>View Technical Report</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
                             </>
-                        )}
-                        {parsedData?.EnteredBy && user?.UserId !== parsedData?.EnteredBy && (
-                            <View className="flex-1">
-                                <TouchableOpacity onPress={() => { router.push({ pathname: "/pages/request-form", params: { id: parsedData.ID, item: JSON.stringify(parsedData) } }) }}
-                                    className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.danger, styles.btnShadow]}>
-                                    <Ionicons name="checkmark-circle" size={24} color={Colors[colorScheme ?? 'light'].white} />
-                                    <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>Acheter</ThemedText>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
+                        </View>
+                    </>
                 )}
 
 

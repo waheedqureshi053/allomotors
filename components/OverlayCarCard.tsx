@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { formatDecimal, formatNODecimal } from '@/utils/helperFunction';
+import { formatNODecimal } from '@/utils/helperFunction';
 import SwipeableRow from './SwipeableRow';
 import { Alert } from 'react-native';
 import { getAuthToken } from '@/app/_services/apiConfig';
@@ -115,6 +115,13 @@ const OverlayCarCardComponent: React.FC<CarCardComponentProps> = ({
       Alert.alert('Erreur', 'Une erreur réseau ou serveur s’est produite');
     }
   };
+
+  const [showPrice, setShowPrice] = useState(false);
+
+  const TooglePricePin = () => {
+    setShowPrice(!showPrice);
+  };
+
   return (
     <SwipeableRow OnDelete={() => { handleDelete }}
       OnEdit={() => { handleEdit(item) }} key={index}>
@@ -187,7 +194,7 @@ const OverlayCarCardComponent: React.FC<CarCardComponentProps> = ({
 
             {/* Status Badge toggleStatus*/}
             <TouchableOpacity
-              onPress={() => {toggleStatus()}}
+              onPress={() => { toggleStatus() }}
               disabled={item?.Status != 'Active' && item.Status != 'InActive'}
               style={{ opacity: item?.Status != 'Active' && item.Status != 'InActive' ? 0.7 : 1 }}
             >
@@ -264,12 +271,17 @@ const OverlayCarCardComponent: React.FC<CarCardComponentProps> = ({
                     </>
                   )}
                 </View>
-                {/* <View style={styles.viewsContainer}>
+
+               
+
+                <View style={styles.viewsContainer}>
+                  {/* <TouchableOpacity onPress={() => {TooglePricePin()}}>
                   <Ionicons name="eye-outline" size={12} color="rgba(255,255,255,0.8)" />
+                  </TouchableOpacity> */}
                   <Text style={styles.viewsText}>
-                    {item?.Views || 0}
+                    {item?.Attributes?.HidePrice == true && ('Prix PIN: ' + item?.Attributes?.PricePin)}
                   </Text>
-                </View> */}
+                </View>
 
               </View>
             </View>
