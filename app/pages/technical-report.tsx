@@ -21,7 +21,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGlobalStyles } from '../_styles/globalStyle';
-import { FlatList } from 'react-native-gesture-handler';
 
 const { width } = Dimensions.get('window');
 
@@ -281,7 +280,7 @@ export default function TechnicalReportScreen({ navigation, advert = MOCK_ADVERT
     const BASE_URL = 'https://dev.allomotors.fr/Content/Webdata/UF/';
 
     const GetAdvert = async (id: any) => {
-        const baseURL = 'https://allomotors.fr/Content/WebData/UF/';
+        const baseURL = 'https://allomotors.fr/Content/WebData/Sign/';
         let data = item ? JSON.parse(params.get("item") as string) : null;
         data.TechReport = data.TechReport ? JSON.parse(data.TechReport) : null;
         if (data?.TechReport?.EmpSignURL)
@@ -801,17 +800,18 @@ export default function TechnicalReportScreen({ navigation, advert = MOCK_ADVERT
             ))}
 
             {/* ── Signature Block ── */}
-            <View style={vStyles.signatureBlock}>
+            <View className='mb-10' style={vStyles.signatureBlock}>
                 <View style={vStyles.signatureBox}>
+                     
                     <Image
                         source={{ uri: parsedData?.TechReport?.EmpSignURL || '' }}
                         resizeMode="contain"
-                        width={120}
-                        height={60}
+                        width={300}
+                        height={100}
                     />
                     <View style={vStyles.signatureLine} />
                     <Text style={tStyles.signatureLabel}>
-                        Agent de contrôle technique{'\n'}Signature
+                        Agent {parsedData?.TechReport?.EmpName || ''} de contrôle technique{'\n'}Signature
                     </Text>
                 </View>
             </View>

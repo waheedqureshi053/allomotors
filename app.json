@@ -2,7 +2,7 @@
   "expo": {
     "name": "AlloMotors",
     "slug": "AllMotor",
-    "version": "6.9.0",
+    "version": "6.9.1",
     "orientation": "portrait",
     "icon": "./assets/images/android_icon.png",
     "scheme": "allomotors",
@@ -43,7 +43,7 @@
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
       "package": "com.allmotorsi.app",
-      "versionCode": 97,
+      "versionCode": 98,
       "permissions": [
         "com.google.android.gms.permission.AD_ID",
         "android.permission.READ_EXTERNAL_STORAGE",

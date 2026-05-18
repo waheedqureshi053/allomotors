@@ -87,9 +87,9 @@ export default function AdvertDetailScreen() {
             const response = await apiCall('POST', `/Account/LoadAdvertDetails/${id}`, null, null);
             const data = response.data.obj; //  await response.json();
             data.Attributes = JSON.parse(data.Attributes);
+            console.log("✅ Advert Detail Report Status:", data?.ReportStatus);
+            console.log("✅ Advert Detail Sale Assistance:", data?.SaleAssistance);
             data.OwnerAttributes = JSON.parse(data?.OwnerAttributes);
-            //console.log("GetAdvert Phone No:", data.OwnerAttributes);
-            //console.log("LoadAdvertDetails OwnerUserType:", data?.OwnerType);
             const baseURL = 'https://allomotors.fr/Content/WebData/UF/thumb2_';
             const slideImages: { image: string }[] = [];
             setCurrentStatus(data?.Status);
@@ -500,21 +500,19 @@ export default function AdvertDetailScreen() {
                             )}
                         </View>
 
-                        <View className="flex flex-row items-center justify-between gap-3 mb-5">
+                        <View className="flex flex-column gap-4 mb-5">
                             <>
-
                                 {parsedData?.EnteredBy && user?.UserId !== parsedData?.EnteredBy && (
-                                    <> 
+                                    <>
                                         <View className="flex-1">
                                             <TouchableOpacity onPress={() => { router.push({ pathname: "/pages/request-form", params: { id: parsedData.ID, item: JSON.stringify(parsedData), RequestType: "Proposal" } }) }}
-                                                className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.outlineBorders]}>
-                                                <Ionicons name="diamond" size={24} color={Colors[colorScheme ?? 'light'].light} />
-                                                <ThemedText lightColor={Colors[colorScheme ?? 'light'].light} style={[styles.fontBold]}>Proposition</ThemedText>
+                                                className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.outlineBorders, { borderColor: Colors[colorScheme ?? 'light'].danger }]}>
+                                                <Ionicons name="diamond" size={24} color={Colors[colorScheme ?? 'light'].danger} />
+                                                <ThemedText lightColor={Colors[colorScheme ?? 'light'].danger} darkColor={Colors[colorScheme ?? 'light'].danger} style={[styles.fontBold]}>Proposition</ThemedText>
                                             </TouchableOpacity>
                                         </View>
                                     </>
                                 )}
-
                                 {parsedData?.SaleAssistance && parsedData?.ReportStatus == 'Inspection Completed' && (
 
                                     <View className="flex-1">
@@ -525,9 +523,9 @@ export default function AdvertDetailScreen() {
                                                 }
                                             })
                                         }}
-                                            className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.success, styles.btnShadow]}>
-                                            <Ionicons name="cog" size={24} color={Colors[colorScheme ?? 'light'].white} />
-                                            <ThemedText lightColor={Colors[colorScheme ?? 'light'].white} style={[styles.fontBold]}>View Technical Report</ThemedText>
+                                            className="flex flex-row items-center justify-center gap-2 rounded-md py-4 px-4" style={[styles.outlineBorders, { borderColor: Colors[colorScheme ?? 'light'].success }]}>
+                                            <Ionicons name="cog" size={24} color={Colors[colorScheme ?? 'light'].success} />
+                                            <ThemedText lightColor={Colors[colorScheme ?? 'light'].success} darkColor={Colors[colorScheme ?? 'light'].success} style={[styles.fontBold]}>Voir Rapport Technique</ThemedText>
                                         </TouchableOpacity>
                                     </View>
                                 )}
